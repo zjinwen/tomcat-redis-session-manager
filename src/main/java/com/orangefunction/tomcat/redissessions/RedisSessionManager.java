@@ -607,7 +607,7 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 	}
 
 	@Override
-	public void remove(Session session, boolean update) {//和之前配置不一样！！
+	public void remove(Session session, boolean update) {//not as pre
 		 byte[] bid = session.getId().getBytes();
 		 this.getRedisCommand(session.getId()).del(bid);
 	}

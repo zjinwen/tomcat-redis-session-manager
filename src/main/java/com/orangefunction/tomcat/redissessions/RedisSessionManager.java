@@ -26,7 +26,7 @@ import org.apache.catalina.util.LifecycleSupport;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
-
+import io.lettuce.core.ReadFrom;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
@@ -653,17 +653,19 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 			List<ClusterNode> clusterNodes=new ArrayList<ClusterNode>(clusterSet.size());
 			for (String uri : clusterSet) {
 				    ClientResources res = DefaultClientResources.builder().build();
-					RedisURI redisUri = RedisURI.create(uri);
+					RedisURI redisUri = RedisURI.create("redis://"+uri);
 					RedisClusterClient clusterClient = RedisClusterClient.create(res,redisUri);
 					List<StatefulRedisClusterConnection<byte[], byte[]>> 
 					connections=new ArrayList<StatefulRedisClusterConnection<byte[], byte[]>>(maxConnection);
 					List<StatefulRedisClusterConnection<String,String>>  stringConnections=new ArrayList<StatefulRedisClusterConnection<String,String>>(maxStringConnection);
 					for(int i=0;i<maxConnection;i++) {
 						StatefulRedisClusterConnection<byte[], byte[]> connection = clusterClient.connect(ByteArrayCodec.INSTANCE);
+						connection.setReadFrom(ReadFrom.SLAVE_PREFERRED);
 						connections.add(connection);
 					}
 					for(int i=0;i<maxStringConnection;i++) {
 						StatefulRedisClusterConnection<String,String> connection = clusterClient.connect();
+						connection.setReadFrom(ReadFrom.SLAVE_PREFERRED);
 						stringConnections.add(connection);
 					}
 					ClusterNode cluster=new ClusterNode(uri,clusterClient,res,connections,stringConnections);

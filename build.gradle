@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 group = 'com.orangefunction'
-version = '2.1.0'
+version = '2.1.1'
 
 repositories {
   mavenCentral()
@@ -49,6 +49,11 @@ artifacts {
 //signing {
 //  sign configurations.archives
 //}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
 
 uploadArchives {
   repositories {

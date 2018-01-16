@@ -652,6 +652,10 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 			}
 			List<ClusterNode> clusterNodes=new ArrayList<ClusterNode>(clusterSet.size());
 			for (String uri : clusterSet) {
+				    uri=uri.trim();
+				    if(uri.length()==0) {
+				    	continue;
+				    }
 				    ClientResources res = DefaultClientResources.builder().build();
 					RedisURI redisUri = RedisURI.create("redis://"+uri);
 					RedisClusterClient clusterClient = RedisClusterClient.create(res,redisUri);

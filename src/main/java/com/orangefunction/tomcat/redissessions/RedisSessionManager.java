@@ -192,7 +192,11 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 			clusters = "";
 		}
 		String[] clusterArray = clusters.split(",");
-		this.clusterSet = new HashSet<String>(Arrays.asList(clusterArray));
+		List<String> as=new ArrayList<String>(clusterArray.length);
+		for(String c:as) {
+			as.add(c.trim());
+		}
+		this.clusterSet = new HashSet<String>(as);
 	}
 
 	public String getSentinels() {

@@ -176,16 +176,7 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 		return this.sessionPersistPoliciesSet.contains(SessionPersistPolicy.ALWAYS_SAVE_AFTER_REQUEST);
 	}
 
-	public String getClusters() {
-		StringBuilder clusters = new StringBuilder();
-		for (Iterator<String> iter = this.clusterSet.iterator(); iter.hasNext();) {
-			clusters.append(iter.next());
-			if (iter.hasNext()) {
-				clusters.append(",");
-			}
-		}
-		return clusters.toString();
-	}
+ 
 
 	public void setClusters(String clusters) {
 		if (null == clusters) {
@@ -193,7 +184,7 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 		}
 		String[] clusterArray = clusters.split(",");
 		List<String> as=new ArrayList<String>(clusterArray.length);
-		for(String c:as) {
+		for(String c:clusterArray) {
 			as.add(c.trim());
 		}
 		this.clusterSet = new HashSet<String>(as);

@@ -3,6 +3,8 @@ package com.orangefunction.tomcat.redissessions;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
@@ -28,6 +31,9 @@ import org.apache.juli.logging.LogFactory;
 
 import io.lettuce.core.ReadFrom;
 import io.lettuce.core.RedisURI;
+import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions.RefreshTrigger;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.cluster.api.sync.RedisAdvancedClusterCommands;
@@ -659,6 +665,14 @@ public class RedisSessionManager extends ManagerBase implements Lifecycle {
 				    ClientResources res = DefaultClientResources.builder().build();
 					RedisURI redisUri = RedisURI.create("redis://"+uri);
 					RedisClusterClient clusterClient = RedisClusterClient.create(res,redisUri);
+					ClusterTopologyRefreshOptions topologyRefreshOptions = ClusterTopologyRefreshOptions.builder()
+                            .enableAdaptiveRefreshTrigger(RefreshTrigger.MOVED_REDIRECT, RefreshTrigger.PERSISTENT_RECONNECTS)
+                            .adaptiveRefreshTriggersTimeout(Duration.ofMinutes(30))
+                            .build();
+                     clusterClient.setOptions(ClusterClientOptions.builder()
+                            .topologyRefreshOptions(topologyRefreshOptions)
+                            .validateClusterNodeMembership(false)
+                            .build());
 					List<StatefulRedisClusterConnection<byte[], byte[]>> 
 					connections=new ArrayList<StatefulRedisClusterConnection<byte[], byte[]>>(maxConnection);
 					List<StatefulRedisClusterConnection<String,String>>  stringConnections=new ArrayList<StatefulRedisClusterConnection<String,String>>(maxStringConnection);
